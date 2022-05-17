@@ -1,0 +1,13 @@
+<p>Contenu de index/inclus.html.twig</p>
+
+{% if maVar is defined %}
+    <p>Le fichier inclus a accès à la variable maVar</p>
+{% else %}
+    <p>Le fichier inclus n'a pas accès à la variable maVar</p>
+{% endif %}
+
+{% if foo is defined %}
+    <p>Le fichier inclus a accès à la variable foo</p>
+{% else %}
+    <p>Le fichier inclus n'a pas accès à la variable foo</p>
+{% endif %}

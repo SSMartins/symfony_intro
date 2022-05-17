@@ -1,0 +1,184 @@
+ {# le template hérite du template base.html.twig à la racine de templates #}
+{% extends 'base.html.twig' %}
+
+{# surcharge (ré-écriture) du bloc body défini dans base.html.twig #}
+{% block body %}
+    <h1>Templating avec TWIG</h1>
+
+    {# création d'une variable #}
+    {% set maVar = 'contenu de ma variable' %}
+
+    {# pour affiche la variable : #}
+    <p>{{ maVar }}</p>
+
+    {# concaténation avec le tilde ~  (c'est comment && en js#}
+    <p>{{ maVar ~ '!' }}</p>
+
+    {# structure conditionnelle #}
+    {% if maVar != '' %}
+        <p>maVar n'est pas vide</p>
+    {% else %}
+        <p>maVar est vide</p>
+    {% endif %}
+
+    {% set vrai = true %}
+    {% set faux = false %}
+
+    {# not en toutes lettres : if (!$faux) #}
+    {% if not faux %}
+        <p>faux n'est pas vrai</p>
+    {% endif %}
+
+    {# and et or en toutes lettres : if ($vrai && !$faux) #}
+    {% if vrai and not faux %}
+        <p>vrai est vrai et faux n'est pas vrai</p>
+    {% endif %}
+
+    {# un tableau indexé : #}
+    {% set tableau = ['a', 'b', 'c', 'd'] %}
+
+    {# pour accéder à un élément d'un tableau #}
+    {{ tableau[2] }}
+    {# ou : #}
+    <br>
+    {{ tableau.2 }}
+    <br>
+
+    {# foreach ($tableau as $lettre) #}
+    {% for lettre in tableau %}
+        {{ lettre }}<br>
+    {% endfor %}
+
+    {# tableau associatif #}
+    {% set assoc = {nom: 'Marx', prenom: 'Groucho', profession: 'Explorateur'} %}
+
+    {# pour accéder à un élément du tableau : #}
+    {{ assoc['prenom'] }}
+    <br>
+    {# ou : #}
+    {{ assoc.prenom }}
+    <br>
+    {# foreach ($assoc as $key => $value) #} {# key = nom, prenom, profession et valeur = 'Marx', ...#}
+    {% for key, value in  assoc %}
+        {{ key }} : {{ value }}<br>
+    {% endfor %}
+
+    {% set vide = [] %} 
+
+    {# on entre dans le else d'un for si le tableau est vide #}
+    {% for element in vide %}
+        {{ element }}<br>
+    {% else %}
+        <p>Le tableau est vide</p>
+    {% endfor %}
+
+    {#
+    loop c'est unconteur
+    loop est disponible dans toutes les boucles
+    et donne l'information sur l'état de la boucle
+    #}
+    {% for value in assoc %}
+        Compteur de tours (1 pour le 1er tour) : {{ loop.index }}<br>
+        Compteur de tours (0 pour le 1er tour) : {{ loop.index0 }}<br>
+
+        {% if loop.first %}
+            1er tour de boucle<br>
+        {% endif %}
+
+        {% if loop.last %}
+            Dernier tour de boucle<br>
+        {% endif %}
+    {% endfor %}
+
+    {# for ($i = 0; $i <= 10; $i++) #}
+    {% for i in 0..10 %}
+        {{ i }},
+    {% endfor %}
+
+    {# TESTS avec is et is not #}
+
+    {# if (isset($maVar)) #}
+    {% if maVar is defined %}
+        <p>maVar existe</p>
+    {% endif %}
+
+    {# if (!empty($maVar)) #}
+    {% if maVar is not empty %}
+        <p>maVar n'est pas vide</p>
+    {% endif %}
+
+    {% set dix = 10 %}
+
+    {% if dix is divisible by(5) %}
+        <p>dix est divisible par 5</p>
+    {% endif %}
+
+{#even test si un numero é paire#}
+    {% if dix is even %}
+        <p>dix est pair</p>
+    {% endif %}
+{# odd verifie nimero impar #}
+    {% if dix is not odd %}
+        <p>dix n'est pas impair</p>
+    {% endif %}
+
+    {# FILTRES avec le pipe | #}  {# pipe c'est de parametres #}
+
+    {# strtoupper($maVar) #}
+    {{ maVar|upper }} {# mettre un majuscule une chaine de caracter#}
+                      {# lower mettre un minuscule une chaine de caracter#}
+                      {#  ...#}
+
+    {% set var = '' %}
+    <br>
+    {# valeur par défaut quand la variable est vide (empty) #}
+    {{ var|default('La variable est vide') }}
+    <br>
+    {# on peut cumuler les filtres : #}
+    {{ var|default('La variable est vide')|upper }}
+
+    {# formatage de date, fonctionne aussi pour un objet DateTime #}
+    <p>{{ '2020-09-28'|date('d/m/Y') }}</p>
+
+    {#
+    demain est un objet DateTime passé par le contrôleur
+    dans le tableau en 2e paramètre de render()
+    #}
+    <p>{{ demain|date('d/m/Y') }}</p>
+
+    {# appel de la méthode format() de DateTime #}
+    <p>{{ demain.format('d/m/Y H:i') }}</p>
+
+    {% set paragraphe = '<p style="color:blue">Un paragraphe</p>' %}
+
+    {# par défaut le HTML est échappé en entités HTML #}
+    {{ paragraphe }}
+
+    {# pour que le HTML ne soit pas échappé : #}
+    {{ paragraphe|raw }}
+
+    {# inclusion de fichier : chemin à partir de la racine du répertoire templates #}
+    {% include 'index/inclus.html.twig' %}
+
+    {# le fichier inclus n'a pas accès aux variables venant de templating.html.twig #}
+    {% include 'index/inclus.html.twig' only %}
+
+    {# le fichier inclus a accès à une variable foo qui vaut 'BAR' #}
+    {% include 'index/inclus.html.twig' with {foo: 'BAR'} %}
+
+    {# le fichier inclus n'a accès qu'à le variable foo #}
+    {% include 'index/inclus.html.twig' with {foo: 'BAR'} only %}
+
+    {# équivalent d'un var_dump() #}
+    {{ dump(maVar) }}   {}
+
+    {# la fonction path() crée l'url de la route dont on lui donne le nom #}
+    <a href="{{ path('app_index') }}">lien vers l'accueil</a>
+{% endblock %}
+
+{# surcharge (ré-écriture) du bloc title défini dans base.html.twig #}
+{% block title %}
+    {# {{ parent() }} reprend le contenu du bloc de base.html.twig #}
+    {{ parent() }} - Templating {#ajust sans efacer qu'est ecrit en base sur base.html.twig#}
+{% endblock %}
+
